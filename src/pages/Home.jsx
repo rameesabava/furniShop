@@ -1,32 +1,124 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
+import Slider from "react-slick";
+import '../App.css'
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { Link } from 'react-router-dom';
 
 function Home() {
-  return (
-   // <div style={{backgroundImage:'url("/banner.png")', height:'100vh', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
 
-      
-    <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img height={'700px'} src="/banner.png" class="d-block w-100" alt="carousel1"/>
-    </div>
-    <div class="carousel-item">
-      <img height={'700px'} src="/carousel2.png" class="d-block w-100" alt="carousel2"/>
-    </div>
-    <div class="carousel-item">
-      <img height={'700px'} src="/carousel3.png" class="d-block w-100" alt="carousel3"/>
-    </div>
-  </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
-</div>
+  const sliderRef = useRef(null);
+
+  useEffect(() => {
+    if (sliderRef.current) {
+      sliderRef.current.slickPlay();
+    }
+  }, []);
+
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 1200,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 4000,
+    arrows: false,
+    pauseOnHover: true,
+    pauseOnFocus: false,
+    fade: true,
+    cssEase: "ease-in-out",
+    waitForAnimate: false
+  };
+
+  const categories = [
+    { name: "Sofa", image: "/sofa.png" },
+    { name: "Table", image: "/table.png" },
+    { name: "Wardrobe", image: "/wardrobe.png" },
+    { name: "Bed", image: "/bed.png" },
+    { name: "Chair", image: "/chair.png" },
+    { name: "Office Furniture", image: "/office.png" },
+    { name: "Outdoor Furniture", image: "/outdoor.png" },
+    { name: "Kids Furniture", image: "/kids.png" }
+  ];
+  return (
+    <>
+      {/* 🔥 Carousel */}
+      <Slider ref={sliderRef} {...settings}>
+
+        {/* Slide 1 */}
+        <div>
+          <div className="slide">
+            <img src="/carousel1.png" alt="slide1" />
+            <div className="overlay"></div>
+
+            <div className="content">
+              <h1>
+                Bring Comfort <br /> Home - Style Every Corner <br />With Elegance
+              </h1>
+              <p>Make your home stylish and modern</p>
+              <Link className='btn btn-success border' to='/products'>
+                Shop Now
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Slide 2 */}
+        <div>
+          <div className="slide">
+            <img src="/carousel2.png" alt="slide2" />
+            <div className="overlay"></div>
+
+            <div className="content">
+              <h1>
+                Modern Living <br />Starts Here - Designed <br /> for Your Style
+              </h1>
+              <p>Make your home stylish and modern</p>
+              <Link className='btn btn-success border' to='/products'>
+                Shop Now
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Slide 3 */}
+        <div>
+          <div className="slide">
+            <img src="/carousel3.png" alt="slide3" />
+            <div className="overlay"></div>
+
+            <div className="content">
+              <h1>
+                Turn Your House <br /> Into a Statement of <br /> Style and Comfort
+              </h1>
+              <p>Make your home stylish and modern</p>
+              <Link className='btn btn-success border' to='/products'>
+                Shop Now
+              </Link>
+            </div>
+          </div>
+        </div>
+
+      </Slider>
+
+      {/* Categories Section */}
+      <div className="categories-section">
+        <h2 className="cat-title">Explore Categories</h2>
+
+        <div className="categories-container">
+          {categories.map((item, index) => (
+            <div key={index} className="category-card">
+              <img src={item.image} alt={item.name} />
+              <div className="category-overlay">
+                <h3>{item.name}</h3>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
   )
 }
 
-export default Home
+export default Home;
