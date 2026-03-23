@@ -19,10 +19,11 @@ function Header() {
     if (!isPaused) {
       x.set(x.get() + delta * 0.1);
       if (x.get() > window.innerWidth) {
-        x.set(-300);
+        x.set(-500);
       }
     }
   });
+
   return (
     <>
       {/*  moving line */}
@@ -39,8 +40,8 @@ function Header() {
             x,
             display: "inline-block"
           }}
-          onMouseEnter={() => setIsPaused(true)}   
-          onMouseLeave={() => setIsPaused(false)}  
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
         >
           <div
             className="text-light d-flex align-items-center"
@@ -74,8 +75,8 @@ function Header() {
             </Typography>
 
             <Link to='/' className="text-light text-decoration-none me-3 underline-hover">Home</Link>
-            <Link to='/' className="text-light text-decoration-none me-3 underline-hover">About Us</Link>
-            <Link to='/' className="text-light text-decoration-none underline-hover">Products</Link>
+            <Link to='/about' className="text-light text-decoration-none me-3 underline-hover">About Us</Link>
+            <Link to='/products' className="text-light text-decoration-none underline-hover">Products</Link>
           </Toolbar>
         </AppBar>
       </Box>

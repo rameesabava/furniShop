@@ -43,7 +43,7 @@ function Home() {
   ];
   return (
     <>
-      {/* 🔥 Carousel */}
+      {/*  Carousel */}
       <Slider ref={sliderRef} {...settings}>
 
         {/* Slide 1 */}
@@ -103,12 +103,12 @@ function Home() {
       </Slider>
 
       {/* Categories Section */}
-      <div className="categories-section">
-        <h2 className="cat-title">Explore Categories</h2>
+      <div className="p-5 text-center">
+        <h2 style={{ fontSize: '32px', fontWeight: '600' }} className="mb-5">Explore Categories</h2>
 
         <div className="categories-container">
           {categories.map((item, index) => (
-            <div key={index} className="category-card">
+            <div key={index} className="category-card d-flex">
               <img src={item.image} alt={item.name} />
               <div className="category-overlay">
                 <h3>{item.name}</h3>
@@ -117,6 +117,13 @@ function Home() {
           ))}
         </div>
       </div>
+{/* browse products btn */}
+<div className="text-center mt-4">
+  <Link to="/products" className="browse-btn">
+    Browse All Products
+  </Link>
+</div>
+
     </>
   )
 }
