@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import jsPDF from "jspdf";
 
-function OrderPage() {
+// ✅ MUI
+import { Modal, Box, Typography, Button } from "@mui/material";
+
+function Order() {
   const { id } = useParams();
 
   const [product, setProduct] = useState(null);
@@ -14,6 +18,10 @@ function OrderPage() {
     address: ""
   });
 
+  const [orderData, setOrderData] = useState(null);
+  const [open, setOpen] = useState(false);
+
+  // 🔥 FETCH PRODUCT
   useEffect(() => {
     axios.get(`http://localhost:3000/products/${id}`)
       .then(res => setProduct(res.data))
@@ -28,39 +36,79 @@ function OrderPage() {
 
   const totalPrice = product.price * quantity;
 
+  // 🔥 PLACE ORDER
   const handleOrder = async () => {
-  try {
-    const orderData = {
-      productId: product.id,
-      productName: product.name,
-      price: product.price,
-      quantity: Number(quantity),
-      totalPrice: totalPrice,
-      customerName: user.name,
-      phone: user.phone,
-      address: user.address,
-      date: new Date().toLocaleString()
-    };
+    try {
+      const data = {
+        productId: product.id,
+        productName: product.name,
+        price: product.price,
+        quantity: Number(quantity),
+        totalPrice: totalPrice,
+        customerName: user.name,
+        phone: user.phone,
+        address: user.address,
+        date: new Date().toLocaleString()
+      };
 
-    await axios.post("http://localhost:3000/orders", orderData);
+      await axios.post("http://localhost:3000/orders", data);
 
-    alert("✅ Order placed successfully!");
+      setOrderData(data);
 
-    // Optional: reset form
-    setUser({ name: "", phone: "", address: "" });
-    setQuantity(1);
+      alert("✅ Order placed successfully!");
 
-  } catch (err) {
-    console.log(err);
-    alert("❌ Failed to place order");
-  }
-};
+      setUser({ name: "", phone: "", address: "" });
+      setQuantity(1);
+
+    } catch (err) {
+      console.log(err);
+      alert("❌ Failed to place order");
+    }
+  };
+
+  // 🔥 FIXED PDF DOWNLOAD (₹ ISSUE SOLVED)
+  const downloadReceipt = () => {
+    const doc = new jsPDF();
+
+    const formatPrice = (value) => value.toLocaleString("en-IN");
+
+    doc.setFontSize(18);
+    doc.text("Order Receipt", 20, 20);
+
+    doc.setFontSize(12);
+
+    doc.text(`Product: ${orderData.productName}`, 20, 40);
+    doc.text(`Price: Rs. ${formatPrice(orderData.price)}`, 20, 50);
+    doc.text(`Quantity: ${orderData.quantity}`, 20, 60);
+    doc.text(`Total: Rs. ${formatPrice(orderData.totalPrice)}`, 20, 70);
+
+    doc.text(`Name: ${orderData.customerName}`, 20, 90);
+    doc.text(`Phone: ${orderData.phone}`, 20, 100);
+    doc.text(`Address: ${orderData.address}`, 20, 110);
+
+    doc.text(`Date: ${orderData.date}`, 20, 130);
+
+    doc.save("receipt.pdf");
+  };
+
+  // 🔥 MUI MODAL STYLE
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    borderRadius: "12px",
+    boxShadow: 24,
+    p: 4
+  };
 
   return (
     <div className="container py-5">
       <div className="row shadow-lg rounded-4 overflow-hidden">
 
-        {/* LEFT - Product Preview */}
+        {/* LEFT */}
         <div className="col-md-6 bg-light d-flex align-items-center justify-content-center p-4">
           <img
             src={product.image}
@@ -70,97 +118,104 @@ function OrderPage() {
           />
         </div>
 
-        {/* RIGHT - Order Form */}
+        {/* RIGHT */}
         <div className="col-md-6 p-5">
           <h2 className="mb-4 fw-bold">Place Your Order</h2>
 
-          {/* Product Info */}
-          <div className="mb-3">
-            <label className="form-label">Product Name</label>
-            <input type="text" className="form-control" value={product.name} readOnly />
-          </div>
+          <input className="form-control mb-2" value={product.name} readOnly />
+          <input className="form-control mb-2" value={product.id} readOnly />
+          <input className="form-control mb-2" value={product.price} readOnly />
 
-          <div className="mb-3">
-            <label className="form-label">Product ID</label>
-            <input type="text" className="form-control" value={product.id} readOnly />
-          </div>
+          <input
+            type="number"
+            className="form-control mb-2"
+            value={quantity}
+            min="1"
+            onChange={(e) => setQuantity(e.target.value)}
+          />
 
-          <div className="mb-3">
-            <label className="form-label">Price (₹)</label>
-            <input type="text" className="form-control" value={product.price} readOnly />
-          </div>
+          <input
+            className="form-control mb-3 fw-bold text-success"
+            value={`Rs. ${totalPrice.toLocaleString("en-IN")}`}
+            readOnly
+          />
 
-          {/* Quantity */}
-          <div className="mb-3">
-            <label className="form-label">Quantity</label>
-            <input
-              type="number"
-              className="form-control"
-              value={quantity}
-              min="1"
-              onChange={(e) => setQuantity(e.target.value)}
-            />
-          </div>
+          <input
+            type="text"
+            name="name"
+            className="form-control mb-2"
+            placeholder="Your Name"
+            onChange={handleChange}
+          />
 
-          {/* Total Price */}
-          <div className="mb-4">
-            <label className="form-label">Total Price (₹)</label>
-            <input
-              type="text"
-              className="form-control fw-bold text-success"
-              value={totalPrice}
-              readOnly
-            />
-          </div>
+          <input
+            type="text"
+            name="phone"
+            className="form-control mb-2"
+            placeholder="Phone"
+            onChange={handleChange}
+          />
 
-          {/* User Details */}
-          <div className="mb-3">
-            <label className="form-label">Your Name</label>
-            <input
-              type="text"
-              name="name"
-              className="form-control"
-              placeholder="Enter your name"
-              onChange={handleChange}
-            />
-          </div>
+          <textarea
+            name="address"
+            className="form-control mb-3"
+            placeholder="Address"
+            onChange={handleChange}
+          ></textarea>
 
-          <div className="mb-3">
-            <label className="form-label">Phone Number</label>
-            <input
-              type="text"
-              name="phone"
-              className="form-control"
-              placeholder="Enter phone number"
-              onChange={handleChange}
-            />
-          </div>
+          <button className="btn btn-dark w-100" onClick={handleOrder}>
+            Confirm Order
+          </button>
 
-          <div className="mb-4">
-            <label className="form-label">Delivery Address</label>
-            <textarea
-              name="address"
-              className="form-control"
-              rows="3"
-              placeholder="Enter delivery address"
-              onChange={handleChange}
-            ></textarea>
-          </div>
-
-          {/* Order Button */}
-          <button 
-  className="btn btn-dark w-100 py-2 rounded-3"
-  onClick={handleOrder}
->
-  Confirm Order
-</button>
-          <button className="btn btn-dark w-100 py-2 rounded-3 mt-3">
+          <button
+            className="btn btn-outline-dark w-100 mt-3"
+            onClick={() => setOpen(true)}
+            disabled={!orderData}
+          >
             View Order Receipt
           </button>
         </div>
       </div>
+
+      {/* 🔥 MUI MODAL */}
+      <Modal open={open} onClose={() => setOpen(false)}>
+        <Box sx={modalStyle}>
+
+          <Typography variant="h6" textAlign="center" mb={2}>
+            🧾 Order Receipt
+          </Typography>
+
+          {orderData && (
+            <>
+              <Typography>Product: {orderData.productName}</Typography>
+              <Typography>Price: Rs. {orderData.price.toLocaleString("en-IN")}</Typography>
+              <Typography>Qty: {orderData.quantity}</Typography>
+              <Typography>Total: Rs. {orderData.totalPrice.toLocaleString("en-IN")}</Typography>
+
+              <hr />
+
+              <Typography>Name: {orderData.customerName}</Typography>
+              <Typography>Phone: {orderData.phone}</Typography>
+              <Typography>Address: {orderData.address}</Typography>
+
+              <Typography mt={1}>Date: {orderData.date}</Typography>
+
+              <Button
+                variant="contained"
+                fullWidth
+                sx={{ mt: 2 }}
+                onClick={downloadReceipt}
+              >
+                Download PDF
+              </Button>
+            </>
+          )}
+
+        </Box>
+      </Modal>
+
     </div>
   );
 }
 
-export default OrderPage;
+export default Order;

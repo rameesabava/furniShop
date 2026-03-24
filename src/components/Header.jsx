@@ -10,7 +10,6 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import { motion, useMotionValue, useAnimationFrame } from "framer-motion";
 
 function Header() {
-
   // top moving line
   const x = useMotionValue(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -26,6 +25,7 @@ function Header() {
 
   return (
     <>
+    
       {/*  moving line */}
       <div
         style={{
