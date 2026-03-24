@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import axios from 'axios'
-
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { getProductAPI } from '../services/allProductsApiService';
 
 gsap.registerPlugin(ScrollTrigger);
 
-function ProductDetails() {
+function ProductView() {
 
   const { id } = useParams()
   const [product, setProduct] = useState()
@@ -16,11 +15,9 @@ function ProductDetails() {
   const textRef = useRef(null)
 
   const getProduct = async () => {
-    try {
-      const response = await axios.get(`http://localhost:3000/products/${id}`)
-      setProduct(response.data)
-    } catch (err) {
-      console.log(err)
+    if (id) {
+      const result = await getProductAPI(id)
+      setProduct(result.data)
     }
   }
 
@@ -28,11 +25,11 @@ function ProductDetails() {
     getProduct()
   }, [id])
 
-  // 🔥 ANIMATIONS
+  // animation
   useEffect(() => {
     if (product) {
 
-      // 🎥 IMAGE ANIMATION
+      // image animation
       gsap.fromTo(
         imageRef.current,
         { scale: 1.2, opacity: 0 },
@@ -44,7 +41,7 @@ function ProductDetails() {
         }
       )
 
-      // ✨ TEXT STAGGER
+      // text
       gsap.fromTo(
         textRef.current.children,
         { y: 50, opacity: 0 },
@@ -60,7 +57,7 @@ function ProductDetails() {
     }
   }, [product])
 
-  // 🔥 IMAGE HOVER (ZOOM + TILT)
+  // image hover animation
   const handleMouseMove = (e) => {
     const img = imageRef.current
     const rect = img.getBoundingClientRect()
@@ -93,60 +90,44 @@ function ProductDetails() {
     })
   }
 
-  if (!product) {
-    return <div className="text-center mt-5">Loading...</div>
-  }
-
   return (
     <div className="container-fluid py-5 bg-light">
 
       <div className="container">
         <div className="row align-items-center g-5">
 
-          {/* 🔥 IMAGE SECTION */}
+          {/* image section */}
           <div className="col-lg-7 text-center">
-            <div
-              className="p-4 bg-white rounded-4 shadow-sm"
+            <div className="p-4 bg-white rounded-4 shadow-sm"
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
               style={{ perspective: "1000px" }}
             >
-              <img
-                ref={imageRef}
-                src={product.image}
-                alt={product.name}
-                className="img-fluid rounded-4"
-                style={{
-                  width: "100%",
-                  maxHeight: "600px",
-                  objectFit: "cover"
-                }}
-              />
+              <img ref={imageRef} src={product?.image} alt={product?.name} className="img-fluid rounded-4" style={{width: "100%", maxHeight: "600px", objectFit: "cover"}}/>
             </div>
           </div>
 
-          {/* 🔥 DETAILS SECTION */}
+          {/* details section */}
           <div className="col-lg-5" ref={textRef}>
 
-            <h1 className="fw-bold mb-3">{product.name}</h1>
+            <h1 className="fw-bold mb-3">{product?.name}</h1>
 
-            <h3 className="text-success mb-3">₹ {product.price}</h3>
+            <h3 className="text-success mb-3">₹ {product?.price}</h3>
 
-            <p className="mb-2">Fabric: {product.fabric}</p>
-            <p className="mb-2">Size: {product.size}</p>
+            <p className="mb-2">Fabric: {product?.fabric}</p>
+            <p className="mb-2">Size: {product?.size}</p>
 
             <p className="mb-4" style={{ lineHeight: "1.7" }}>
-              {product.description ||
-                "Experience premium quality and modern design. Built for comfort, durability, and style."}
+              {product?.description}
             </p>
 
-            {/* 🔥 BUTTONS */}
+            {/* buttons */}
             <div className="d-flex gap-3 mb-4">
-              <Link to={`/order/${id}`} className="btn btn-dark px-4 py-2 btn-animate">
+              <Link to={`/order/${id}`} className="btn btn-dark px-4 py-2">
                 Order Now
               </Link>
 
-              <Link to="/products" className="btn btn-outline-secondary px-4 py-2 btn-animate">
+              <Link to="/products" className="btn btn-outline-secondary px-4 py-2">
                 Back
               </Link>
             </div>
@@ -160,4 +141,4 @@ function ProductDetails() {
   )
 }
 
-export default ProductDetails
+export default ProductView

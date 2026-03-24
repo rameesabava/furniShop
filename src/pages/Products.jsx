@@ -1,35 +1,34 @@
 import React, { useEffect, useState, useRef } from 'react'
 import '../App.css'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { getAllProductsAPI } from '../services/allProductsApiService';
 
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger)
 
 function Products() {
 
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([])
+ // console.log(products);
 
-  const cardRefs = useRef([]);
-  const imageRefs = useRef([]);
+  const cardRefs = useRef([])
 
-  // 🔥 FETCH PRODUCTS
+  const imageRefs = useRef([])
+
+  // fetch products
   const getProducts = async () => {
-    try {
-      const response = await axios.get("http://localhost:3000/products");
-      setProducts(response.data);
-    } catch (err) {
-      console.log(err);
+    const response = await getAllProductsAPI()
+    if (response.status == 200) {
+      setProducts(response.data)
     }
   };
 
   useEffect(() => {
-    getProducts();
-  }, []);
+    getProducts()
+  }, [])
 
-  // 🔥 SCROLL ANIMATION
+  // animation
   useEffect(() => {
     if (products.length > 0) {
       gsap.fromTo(
@@ -43,24 +42,24 @@ function Products() {
           stagger: 0.15,
           ease: "power4.out",
           scrollTrigger: {
-            trigger: ".product-grid",
+            trigger: ".productCard",
             start: "top 80%",
           }
         }
-      );
+      )
     }
-  }, [products]);
+  }, [products])
 
-  // 🔥 3D CARD HOVER
+  // card hover animation
   const handleMouseMove = (e, index) => {
-    const card = cardRefs.current[index];
-    const rect = card.getBoundingClientRect();
+    const card = cardRefs.current[index]
+    const rect = card.getBoundingClientRect()
 
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
 
-    const rotateX = -(y - rect.height / 2) / 10;
-    const rotateY = (x - rect.width / 2) / 10;
+    const rotateX = -(y - rect.height / 2) / 10
+    const rotateY = (x - rect.width / 2) / 10
 
     gsap.to(card, {
       rotateX,
@@ -68,75 +67,63 @@ function Products() {
       transformPerspective: 1000,
       duration: 0.3,
       ease: "power2.out"
-    });
-  };
+    })
+  }
 
   const handleMouseLeave = (index) => {
-    const card = cardRefs.current[index];
+    const card = cardRefs.current[index]
 
     gsap.to(card, {
       rotateX: 0,
       rotateY: 0,
       duration: 0.5,
       ease: "power3.out"
-    });
-  };
+    })
+  }
 
-  // 🔥 IMAGE ZOOM (CURSOR BASED)
+  // image zoom hover
   const handleImageZoom = (e, index) => {
-    const img = imageRefs.current[index];
-    const rect = img.getBoundingClientRect();
+    const img = imageRefs.current[index]
+    const rect = img.getBoundingClientRect()
 
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
 
-    const xPercent = (x / rect.width) * 100;
-    const yPercent = (y / rect.height) * 100;
+    const xPercent = (x / rect.width) * 100
+    const yPercent = (y / rect.height) * 100
 
     gsap.to(img, {
       transformOrigin: `${xPercent}% ${yPercent}%`,
       scale: 2,
       duration: 0.3,
       ease: "power2.out"
-    });
-  };
+    })
+  }
 
   const resetImageZoom = (index) => {
-    const img = imageRefs.current[index];
+    const img = imageRefs.current[index]
 
     gsap.to(img, {
       scale: 1,
       duration: 0.5,
       ease: "power3.out"
-    });
-  };
+    })
+  }
 
   return (
     <div>
-      <div className="product-list">
-        <h2 className="title">Our Products</h2>
-
-        <div className="product-grid">
+      <div className="products">
+        <h2 className="productTitle">Our Products</h2>
+        <div className="productCard">
           {products.map((item, index) => (
-            <div
-              className="card"
-              key={item.id}
-              ref={(el) => (cardRefs.current[index] = el)}
-              onMouseMove={(e) => handleMouseMove(e, index)}
-              onMouseLeave={() => handleMouseLeave(index)}
+            <div className="card" key={item.id} ref={(el) => (cardRefs.current[index] = el)} onMouseMove={(e) => handleMouseMove(e, index)} onMouseLeave={() => handleMouseLeave(index)}
             >
 
-              {/* 🔥 IMAGE ZOOM AREA */}
-              <div
-                className="image-container"
+              {/* image zoom */}
+              <div className="image-container"
                 onMouseMove={(e) => handleImageZoom(e, index)}
-                onMouseLeave={() => resetImageZoom(index)}
-              >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  ref={(el) => (imageRefs.current[index] = el)}
-                />
+                onMouseLeave={() => resetImageZoom(index)}>
+                <img src={item.image} alt={item.name} ref={(el) => (imageRefs.current[index] = el)}/>
               </div>
 
               <div className="card-body">
@@ -159,7 +146,7 @@ function Products() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default Products;
+export default Products

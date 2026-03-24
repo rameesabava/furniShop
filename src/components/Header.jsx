@@ -10,10 +10,10 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import { motion, useMotionValue, useAnimationFrame } from "framer-motion";
 
 function Header() {
+
   // top moving line
   const x = useMotionValue(0);
   const [isPaused, setIsPaused] = useState(false);
-
   useAnimationFrame((t, delta) => {
     if (!isPaused) {
       x.set(x.get() + delta * 0.1);
@@ -25,39 +25,19 @@ function Header() {
 
   return (
     <>
-    
-      {/*  moving line */}
-      <div
-        style={{
-          overflow: "hidden",
-          whiteSpace: "nowrap",
-          background: "#2b2929"
-        }}
 
-      >
-        <motion.div
-          style={{
-            x,
-            display: "inline-block"
-          }}
+      {/* top  moving line */}
+      <div style={{ overflow: "hidden", backgroundColor: "rgb(62, 60, 60)" }}>
+        <motion.div style={{ x }}
           onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
-          <div
-            className="text-light d-flex align-items-center"
-            style={{ paddingRight: "80px" }}
-          >
+          onMouseLeave={() => setIsPaused(false)}>
+          <div className="text-light d-flex align-items-center">
             <GoTag className="m-2" />
             <span>
               Only this week <span className='text-success'>-20%</span> For all Sofas and Couches
             </span>
             <FaArrowRightLong className="m-2" />
-            <Link
-              to="/products"
-              className="text-success text-decoration-none me-3 underline-hover"
-            >
-              Sofas and Couches
-            </Link>
+            <Link to="/products" className="text-success text-decoration-none me-3 links">Sofas and Tables</Link>
           </div>
         </motion.div>
       </div>
@@ -74,9 +54,8 @@ function Header() {
               </h3>
             </Typography>
 
-            <Link to='/' className="text-light text-decoration-none me-3 underline-hover">Home</Link>
-            <Link to='/about' className="text-light text-decoration-none me-3 underline-hover">About Us</Link>
-            <Link to='/products' className="text-light text-decoration-none underline-hover">Products</Link>
+            <Link to='/' className="text-light text-decoration-none me-3 links">Home</Link>
+            <Link to='/products' className="text-light text-decoration-none links">Products</Link>
           </Toolbar>
         </AppBar>
       </Box>
@@ -84,4 +63,4 @@ function Header() {
   )
 }
 
-export default Header;
+export default Header

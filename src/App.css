@@ -1,10 +1,10 @@
 
-/* links */
-.underline-hover {
+/* Navigation bar links */
+.links {
   position: relative;
 }
 
-.underline-hover::after {
+.links::after {
   content: "";
   position: absolute;
   width: 0%;
@@ -15,8 +15,28 @@
   transition: width 0.3s ease;
 }
 
-.underline-hover:hover::after {
+.links:hover::after {
   width: 100%;
+}
+
+/* footer */
+
+.footerLink {
+  transition: all 0.3s ease;
+}
+
+.footerLink:hover {
+  transform: translateX(5px);
+}
+
+.footerIcon {
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.footerIcon:hover {
+  color: #ffffff;
+  transform: scale(1.2);
 }
 
 /* slide */
@@ -31,15 +51,15 @@
   object-fit: cover;
 }
 
-/* dark overlay */
-.overlay {
+/* dark shade */
+.shade {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.2);
 }
 
 
-/* text */
+/* content */
 .content {
   position: absolute;
   top: 50%;
@@ -47,7 +67,6 @@
   transform: translateY(-50%);
   color: white;
   z-index: 10;
-  animation: fadeUp 1s ease-in-out;
   line-height: 1.5;
 }
 
@@ -81,35 +100,10 @@
   transform: scale(1.05);
 }
 
-/* footer */
 
-.footer-link {
-  transition: all 0.3s ease;
-}
+/* categories section */
 
-.footer-link:hover {
-  color: #ffffff;
-  transform: translateX(5px);
-}
-
-.social-icon {
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.social-icon:hover {
-  color: #ffffff;
-  transform: scale(1.2);
-}
-
-.categories-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center; 
-  gap: 20px;
-}
-
-.category-card {
+.categoryCard {
   width: 350px;
   height: 250px;
   position: relative;
@@ -118,19 +112,19 @@
   cursor: pointer;
 }
 
-.category-card img {
+.categoryCard img {
   width: 100%;
   height: 250px;
   object-fit: cover;
   transition: 0.4s ease;
 }
 
-.category-card:hover img {
+.categoryCard:hover img {
   transform: scale(1.1);
 }
 
-/* Overlay */
-.category-overlay {
+/* category shade */
+.categoryShade {
   position: absolute;
   bottom: 0;
   width: 100%;
@@ -140,13 +134,13 @@
   text-align: center;
 }
 
-.category-overlay h3 {
+.categoryShade h3 {
   margin: 0;
   font-size: 18px;
 }
 
 /* browse btn */
-.browse-btn {
+.browseBtn {
   display: inline-block;
   padding: 12px 30px;
   background: #000;
@@ -158,39 +152,35 @@
   margin-bottom:20px;
 }
 
-.browse-btn:hover {
+.browseBtn:hover {
   background: green;
   transform: translateY(-3px);
 }
 
 /* product page */
 
-.product-list {
+.products {
   padding: 50px 8%;
-  background: linear-gradient(to right, #f8fafc, #eef2f7);
+  background-color: white;
   min-height: 100vh;
   font-family: 'Segoe UI', sans-serif;
 }
 
-.title {
+.productTitle {
   text-align: center;
-  font-size: 2.5rem;
+  font-size: 50px;
   margin-bottom: 40px;
   font-weight: 600;
-  color: #222;
-  letter-spacing: 1px;
 }
 
-/* GRID */
-.product-grid {
+/* product cards */
+.productCard {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 30px;
 }
 
-/* CARD */
 .card {
-  background: #fff;
   border-radius: 18px;
   overflow: hidden;
   transition: all 0.35s ease;
@@ -227,7 +217,7 @@ transform: scale(1.15) translateY(-5px);
   box-shadow: 0 25px 50px rgba(0,0,0,0.2);
 }
 
-/* BODY */
+/* card body */
 .card-body {
   padding: 20px;
   text-align: center;
@@ -236,7 +226,7 @@ transform: scale(1.15) translateY(-5px);
 .card-body h3 {
   font-size: 1.2rem;
   margin-bottom: 10px;
-  color: #333;
+  color: #333333;
 }
 
 .card-body p {
@@ -245,66 +235,21 @@ transform: scale(1.15) translateY(-5px);
   color: #555;
 }
 
-/* BUTTON */
-.card-body button {
-  margin-top: 15px;
-  padding: 10px 22px;
-  border: none;
-  background: linear-gradient(135deg, #111, #333);
-  color: #fff;
-  border-radius: 30px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  letter-spacing: 0.5px;
+/* buttons */
+
+
+.view-btn, .order-btn {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid black;
+  border-radius: 25px;
+  text-decoration: none;
+  color: black;
   transition: all 0.3s ease;
 }
 
-.card-body button:hover {
-  background: linear-gradient(135deg, #ff4d4d, #ff1a1a);
-  transform: scale(1.05);
-}
-
-/* OPTIONAL: BADGE (NEW / SALE) */
-.card::before {
-  content: "NEW";
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  background: #111;
-  color: #fff;
-  padding: 4px 10px;
-  font-size: 0.7rem;
-  border-radius: 20px;
-  opacity: 0.85;
-}
-
-.view-btn {
-  padding: 8px 16px;
-  background: #fff;
-  border: 1px solid #000;
-  border-radius: 25px;
-  text-decoration: none;
-  color: #000;
-  transition: all 0.3s ease;
-}
-
-.view-btn:hover {
-  background: #000;
-  color: #fff;
-  transform: translateY(-3px) scale(1.05);
-}
-
-.order-btn {
-  padding: 8px 16px;
-  background: #fff;
-  border: 1px solid #000;
-  border-radius: 25px;
-  text-decoration: none;
-  color: #000;
-transition: all 0.3s ease;
-}
-.order-btn:hover {
-  background: #000;
-  color: #fff;
+.view-btn:hover, .order-btn:hover {
+  background: black;
+  color: white;
   transform: translateY(-3px) scale(1.05);
 }
