@@ -32,7 +32,6 @@ function Footer() {
                         <h5 className="mb-3">Quick Links</h5>
                         <div className="d-flex flex-column gap-2">
                             <Link className="text-decoration-none text-secondary footerLink" to="/">Home</Link>
-                            <Link className="text-decoration-none text-secondary footerLink" to="/about">About Us</Link>
                             <Link className="text-decoration-none text-secondary footerLink" to="/products">Products</Link>
                         </div>
                     </div>
