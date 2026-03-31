@@ -1,25 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import jsPDF from "jspdf";
-import { Modal, Box, Typography, Button } from "@mui/material";
-import { addOrderAPI, getProductAPI } from "../services/allProductsApiService";
+import { useParams } from "react-router-dom"
+import jsPDF from "jspdf"
+import { Modal, Box, Typography, Button } from "@mui/material"
+import { addOrderAPI, getProductAPI } from "../services/allProductsApiService"
+import { useFormik } from "formik"
+import * as Yup from "yup"
 
 function Order() {
+
   const { id } = useParams()
 
   const [product, setProduct] = useState()
   const [quantity, setQuantity] = useState(1)
+  const [orderData, setOrderData] = useState()
+  const [open, setOpen] = useState(false)
 
-  const [user, setUser] = useState({
-    name: "",
-    phone: "",
-    address: ""
-  });
-
-  const [orderData, setOrderData] = useState();
-  const [open, setOpen] = useState(false);
-
-  // fetch product
+  // fetching product
   const getProduct = async () => {
     if (id) {
       const result = await getProductAPI(id)
@@ -31,15 +27,33 @@ function Order() {
     getProduct()
   }, [id])
 
-  const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value })
-  };
-
   const totalPrice = product ? product.price * quantity : 0
 
-  // place order
-  const handleOrder = async () => {
-    if (user.name && user.phone && user.address && quantity) {
+  // validation
+  const validation = Yup.object({
+    name: Yup.string()
+      .min(3, "Minimum 3 characters")
+      .required("Name is required"),
+
+    phone: Yup.string()
+      .matches(/^[0-9]{10}$/, "Enter valid 10 digit phone number")
+      .required("Phone is required"),
+
+    address: Yup.string()
+      .min(5, "Address too short")
+      .required("Address is required"),
+  })
+
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      phone: "",
+      address: "",
+    },
+    validation,
+    onSubmit: async (values, { resetForm }) => {
+      if (!product) return
+
       try {
         const data = {
           productId: product.id,
@@ -47,31 +61,27 @@ function Order() {
           price: product.price,
           quantity: Number(quantity),
           totalPrice: totalPrice,
-          customerName: user.name,
-          phone: user.phone,
-          address: user.address,
-          date: new Date().toLocaleString()
+          customerName: values.name,
+          phone: values.phone,
+          address: values.address,
+          date: new Date().toLocaleString(),
         }
+
         const response = await addOrderAPI(data)
 
-        setOrderData(response.data);
+        setOrderData(response.data)
         alert("Order placed successfully!")
 
-        setUser({ name: "", phone: "", address: "" })
+        resetForm()
         setQuantity(1)
-
       } catch (err) {
-        console.log(err);
+        console.log(err)
         alert("Order failed!!!")
-
       }
-    } else {
-      alert("Please fill the form completely!!!")
-    }
+    },
+  })
 
-  }
-
-  // pdf download
+  // Download receipt
   const downloadReceipt = () => {
     const doc = new jsPDF()
 
@@ -93,8 +103,8 @@ function Order() {
 
     doc.text(`Date: ${orderData.date}`, 20, 130)
 
-    doc.save(`${orderData.customerName}`)
-  };
+    doc.save(`${orderData.customerName}.pdf`)
+  }
 
   // modal
   const modalStyle = {
@@ -106,62 +116,121 @@ function Order() {
     bgcolor: "background.paper",
     borderRadius: "12px",
     boxShadow: 24,
-    p: 4
+    p: 4,
   };
 
   return (
     <div className="container py-5">
       <div className="row shadow-lg rounded-4 overflow-hidden">
-        {/* image section */}
+        {/* Image Section */}
         <div className="col-md-6 bg-light d-flex align-items-center justify-content-center p-4">
-          <img src={product?.image} alt="productImage" className="img-fluid rounded-4"
-            style={{ maxHeight: "400px", objectFit: "cover" }} />
+          <img
+            src={product?.image}
+            alt="product"
+            className="img-fluid rounded-4"
+            style={{ maxHeight: "400px", objectFit: "cover" }}
+          />
         </div>
 
-        {/* form section */}
+        {/* Form Section */}
         <div className="col-md-6 p-5">
           <h2 className="mb-4 fw-bold">Place Your Order</h2>
 
-          <input className="form-control mb-2" value={product?.name} readOnly />
-          <input className="form-control mb-2" value={product?.id} readOnly />
-          <input className="form-control mb-2" value={product?.price} readOnly />
+          <input className="form-control mb-2" value={product?.name || ""} readOnly />
+          <input className="form-control mb-2" value={product?.id || ""} readOnly />
+          <input className="form-control mb-2" value={product?.price || ""} readOnly />
 
-          <input type="number" className="form-control mb-2" value={quantity} min="1"
-            onChange={(e) => setQuantity(Number(e.target.value))} />
+          <input
+            type="number"
+            className="form-control mb-2"
+            value={quantity}
+            min="1"
+            onChange={(e) => setQuantity(Number(e.target.value))}
+          />
 
-          <input className="form-control mb-3 fw-bold text-success" value={`Rs. ${totalPrice}`}
-            readOnly />
+          <input
+            className="form-control mb-3 fw-bold text-success"
+            value={`Rs. ${totalPrice}`}
+            readOnly
+          />
 
-          <input type="text" name="name" className="form-control mb-2" placeholder="Your Name" onChange={handleChange} />
+          {/* name */}
+          <input
+            type="text"
+            name="name"
+            className="form-control mb-1"
+            placeholder="Your Name"
+            value={formik.values.name}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+          />
+          {formik.touched.name && formik.errors.name && (
+            <small className="text-danger">{formik.errors.name}</small>
+          )}
 
-          <input type="text" name="phone" className="form-control mb-2" placeholder="Phone"
-            onChange={handleChange} />
+          {/* Phone */}
+          <input
+            type="text"
+            name="phone"
+            className="form-control mb-1"
+            placeholder="Phone"
+            value={formik.values.phone}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+          />
+          {formik.touched.phone && formik.errors.phone && (
+            <small className="text-danger">{formik.errors.phone}</small>
+          )}
 
-          <textarea name="address" className="form-control mb-3" placeholder="Address"
-            onChange={handleChange}></textarea>
+          {/* Address */}
+          <textarea
+            name="address"
+            className="form-control mb-1"
+            placeholder="Address"
+            value={formik.values.address}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+          ></textarea>
+          {formik.touched.address && formik.errors.address && (
+            <small className="text-danger">{formik.errors.address}</small>
+          )}
 
-          <button className="btn btn-dark w-100" onClick={handleOrder}>Confirm Order</button>
+          {/* Submit */}
+          <button
+            className="btn btn-dark w-100 mt-3"
+            onClick={formik.handleSubmit}
+            disabled={!formik.isValid}
+          >
+            Confirm Order
+          </button>
 
-          <button className="btn btn-outline-dark w-100 mt-3" onClick={() => setOpen(true)} disabled={!orderData}>
+          <button
+            className="btn btn-outline-dark w-100 mt-3"
+            onClick={() => setOpen(true)}
+            disabled={!orderData}
+          >
             View Order Receipt
           </button>
         </div>
       </div>
 
-      {/* modal */}
+      {/* Modal */}
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box sx={modalStyle}>
-
           <Typography variant="h6" textAlign="center" mb={2}>
-             Order Receipt
+            Order Receipt
           </Typography>
 
           {orderData && (
             <>
               <Typography>Product: {orderData.productName}</Typography>
-              <Typography>Price: Rs. {orderData.price.toLocaleString("en-IN")}</Typography>
+              <Typography>
+                Price: Rs. {orderData.price.toLocaleString("en-IN")}
+              </Typography>
               <Typography>Qty: {orderData.quantity}</Typography>
-              <Typography>Total: Rs. {orderData.totalPrice.toLocaleString("en-IN")}</Typography>
+              <Typography>
+                Total: Rs. {orderData.totalPrice.toLocaleString("en-IN")}
+              </Typography>
 
               <hr />
 
@@ -181,12 +250,10 @@ function Order() {
               </Button>
             </>
           )}
-
         </Box>
       </Modal>
-
     </div>
-  )
+  );
 }
 
-export default Order
+export default Order;
